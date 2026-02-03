@@ -2,7 +2,7 @@ name: Build RPA Windows EXE
 
 on:
   push:
-    branches: [ main ] # Se activa cada vez que subes cambios a la rama main
+    branches: [ main ] # Se activa cada vez subes cambios a la rama main
 
 jobs:
   build:
