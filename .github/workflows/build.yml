@@ -2,15 +2,15 @@ name: Build RPA Windows EXE
 
 on:
   push:
-    branches: [ main ] # Se activa cada vez subes cambios a la rama main
+    branches: [ main, master ] # Se adapta a cualquier nombre de rama principal
 
 jobs:
   build:
-    runs-on: windows-latest # Aquí ocurre la magia: usamos Windows
+    runs-on: windows-latest
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -21,14 +21,21 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install playwright pandas openpyxl pyinstaller
+        # Instalar navegador en una ruta específica que podamos empaquetar
+        $env:PLAYWRIGHT_BROWSERS_PATH="pw-browsers"
         playwright install chromium
 
     - name: Build EXE with PyInstaller
       run: |
-        pyinstaller --onedir --noconsole main.py
+        # Empaquetamos el script y la carpeta de navegadores
+        $env:PLAYWRIGHT_BROWSERS_PATH="pw-browsers"
+        pyinstaller --noconsole --onefile `
+          --add-data "pw-browsers;pw-browsers" `
+          --name "RPA_Asocebu_Bot" `
+          main.py
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: RPA-Asocebu-Windows
-        path: dist/main/
+        name: RPA-Asocebu-Windows-Tool
+        path: dist/RPA_Asocebu_Bot.exe
